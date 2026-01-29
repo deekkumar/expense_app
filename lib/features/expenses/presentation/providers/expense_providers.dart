@@ -123,11 +123,16 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
     final dummyData = [
       {
         'amount': 45.50,
-        'category': 'Food',
+        'category': 'Grocery',
         'note': 'Grocery shopping',
         'days': 0,
       },
-      {'amount': 12.00, 'category': 'Transport', 'note': 'Bus fare', 'days': 0},
+      {
+        'amount': 12.00,
+        'category': 'Transportation',
+        'note': 'Bus fare',
+        'days': 0,
+      },
       {
         'amount': 120.00,
         'category': 'Shopping',
@@ -142,32 +147,32 @@ class ExpensesNotifier extends StateNotifier<AsyncValue<List<ExpenseEntity>>> {
       },
       {
         'amount': 85.00,
-        'category': 'Health',
+        'category': 'Healthcare',
         'note': 'Doctor visit',
         'days': 3,
       },
       {
         'amount': 200.00,
-        'category': 'Bills',
+        'category': 'Bills & Utilities',
         'note': 'Electricity bill',
         'days': 5,
       },
       {
         'amount': 15.00,
-        'category': 'Food',
+        'category': 'Food & Dining',
         'note': 'Lunch with friend',
         'days': 6,
       },
       {
         'amount': 50.00,
-        'category': 'Transport',
+        'category': 'Transportation',
         'note': 'Gas refill',
         'days': 8,
       },
       {'amount': 30.00, 'category': 'Shopping', 'note': 'Books', 'days': 10},
       {
         'amount': 10.00,
-        'category': 'Food',
+        'category': 'Food & Dining',
         'note': 'Coffee morning',
         'days': 12,
       },

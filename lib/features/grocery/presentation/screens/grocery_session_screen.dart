@@ -18,6 +18,8 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
   final _itemNameController = TextEditingController();
   final _itemPriceController = TextEditingController();
   final _storeNameController = TextEditingController();
+  final _itemNameFocus = FocusNode();
+  final _itemPriceFocus = FocusNode();
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -25,6 +27,8 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
     _itemNameController.dispose();
     _itemPriceController.dispose();
     _storeNameController.dispose();
+    _itemNameFocus.dispose();
+    _itemPriceFocus.dispose();
     super.dispose();
   }
 
@@ -37,17 +41,34 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
 
       _itemNameController.clear();
       _itemPriceController.clear();
+
       // Keep focus on item name for rapid entry
+      _itemNameFocus.requestFocus();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(groceryNotifierProvider);
-    final currencyFormat = NumberFormat.simpleCurrency();
+    final currencyFormat = NumberFormat.simpleCurrency(
+      locale: 'en_IN',
+      decimalDigits: 2,
+    );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('New Grocery Session')),
+      appBar: AppBar(
+        title: const Text('New Grocery Session'),
+        actions: [
+          IconButton(
+            onPressed: () {
+              // Navigate to OCR Scan
+              context.pushNamed('grocery-ocr');
+            },
+            icon: const Icon(Icons.document_scanner_outlined),
+            tooltip: 'Scan Receipt',
+          ),
+        ],
+      ),
       body: Column(
         children: [
           // 1. Store Details & Add Item Form
@@ -78,9 +99,16 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
                           flex: 2,
                           child: TextFormField(
                             controller: _itemNameController,
+                            focusNode: _itemNameFocus,
+                            textInputAction: TextInputAction.next,
                             decoration: const InputDecoration(
                               labelText: 'Item Name',
                             ),
+                            onFieldSubmitted: (_) {
+                              FocusScope.of(
+                                context,
+                              ).requestFocus(_itemPriceFocus);
+                            },
                             validator: (value) {
                               if (value == null || value.isEmpty) {
                                 return 'Required';
@@ -94,8 +122,11 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
                           flex: 1,
                           child: TextFormField(
                             controller: _itemPriceController,
+                            focusNode: _itemPriceFocus,
+                            textInputAction: TextInputAction.done,
                             decoration: const InputDecoration(
                               labelText: 'Price',
+                              prefixText: '₹',
                             ),
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
@@ -159,13 +190,33 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
                               .read(groceryNotifierProvider.notifier)
                               .removeItem(item.id);
                         },
-                        child: ListTile(
-                          title: Text(item.name),
-                          trailing: Text(
-                            currencyFormat.format(item.price),
-                            style: Theme.of(context).textTheme.titleMedium,
+                        child: Card(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          elevation: 0,
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.surfaceVariant.withOpacity(0.3),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 4,
+                            ),
+                            title: Text(
+                              item.name,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing: Text(
+                              currencyFormat.format(item.price),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                            ),
+                            onTap: () => _showEditItemDialog(context, item),
                           ),
-                          onTap: () => _showEditItemDialog(context, item),
                         ),
                       );
                     },
@@ -207,41 +258,46 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  if (state.items.isNotEmpty)
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: FilledButton(
-                        onPressed: state.isSubmitting
-                            ? null
-                            : () async {
-                                try {
-                                  await ref
-                                      .read(groceryNotifierProvider.notifier)
-                                      .submitSession();
-                                  if (context.mounted) {
-                                    context.pop(); // Go back to expense list
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Grocery session saved!'),
-                                      ),
-                                    );
-                                  }
-                                } catch (e) {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Error: $e')),
-                                    );
-                                  }
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: FilledButton(
+                      onPressed: (state.items.isEmpty || state.isSubmitting)
+                          ? null
+                          : () async {
+                              try {
+                                await ref
+                                    .read(groceryNotifierProvider.notifier)
+                                    .submitSession();
+                                if (context.mounted) {
+                                  context.pop(); // Go back to expense list
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Grocery session saved!'),
+                                    ),
+                                  );
                                 }
-                              },
-                        child: state.isSubmitting
-                            ? const CircularProgressIndicator.adaptive(
-                                backgroundColor: Colors.white,
-                              )
-                            : const Text('Complete Purchase'),
-                      ),
+                              } catch (e) {
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error: $e'),
+                                      backgroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.error,
+                                    ),
+                                  );
+                                }
+                              }
+                            },
+                      child: state.isSubmitting
+                          ? const CircularProgressIndicator.adaptive(
+                              backgroundColor: Colors.white,
+                            )
+                          : const Text('Complete Purchase'),
                     ),
+                  ),
                 ],
               ),
             ),

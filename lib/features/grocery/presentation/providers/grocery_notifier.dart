@@ -1,6 +1,5 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
-import 'dart:convert';
 import '../../../expenses/presentation/providers/expense_providers.dart';
 import '../../domain/entities/grocery_item.dart';
 import 'grocery_state.dart';
@@ -28,6 +27,19 @@ class GroceryNotifier extends _$GroceryNotifier {
     );
 
     final updatedList = [...state.items, newItem];
+    state = state.copyWith(
+      items: updatedList,
+      totalAmount: _calculateTotal(updatedList),
+    );
+  }
+
+  void addItems(List<GroceryItem> newItems) {
+    if (newItems.isEmpty) return;
+
+    // Assign new IDs if necessary or trust incoming (OCR generates IDs)
+    // Here we assume OCR IDs are temporary but valid UUIDs.
+
+    final updatedList = [...state.items, ...newItems];
     state = state.copyWith(
       items: updatedList,
       totalAmount: _calculateTotal(updatedList),
@@ -80,17 +92,12 @@ class GroceryNotifier extends _$GroceryNotifier {
             .toList(),
       };
 
-      final noteString = "Grocery - $storeName\n\n${jsonEncode(metadata)}";
-
-      // Although the prompt says "metadata (optional): itemBreakdown (optional JSON/string)"
-      // and "title: Grocery - <Local Store Name>", I am encoding it in the note.
-      // If simply "Grocery - StoreName" is preferred as the 'title' equivalent, I'll put that in the note's first line.
-
       await repository.createExpense(
         amount: state.totalAmount,
         category: 'Grocery',
         date: DateTime.now(),
-        note: noteString,
+        note: "Grocery at $storeName",
+        metadata: metadata,
       );
 
       // On success, clear state

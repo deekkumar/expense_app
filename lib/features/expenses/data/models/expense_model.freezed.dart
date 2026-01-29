@@ -34,6 +34,8 @@ mixin _$ExpenseModel {
   DateTime get createdAt => throw _privateConstructorUsedError;
   @HiveField(6)
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  @HiveField(7)
+  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
   @JsonKey(ignore: true)
@@ -54,7 +56,8 @@ abstract class $ExpenseModelCopyWith<$Res> {
       @HiveField(3) DateTime date,
       @HiveField(4) String? note,
       @HiveField(5) DateTime createdAt,
-      @HiveField(6) DateTime? updatedAt});
+      @HiveField(6) DateTime? updatedAt,
+      @HiveField(7) Map<String, dynamic>? metadata});
 }
 
 /// @nodoc
@@ -77,6 +80,7 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
     Object? note = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
+    Object? metadata = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -107,6 +111,10 @@ class _$ExpenseModelCopyWithImpl<$Res, $Val extends ExpenseModel>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      metadata: freezed == metadata
+          ? _value.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -126,7 +134,8 @@ abstract class _$$ExpenseModelImplCopyWith<$Res>
       @HiveField(3) DateTime date,
       @HiveField(4) String? note,
       @HiveField(5) DateTime createdAt,
-      @HiveField(6) DateTime? updatedAt});
+      @HiveField(6) DateTime? updatedAt,
+      @HiveField(7) Map<String, dynamic>? metadata});
 }
 
 /// @nodoc
@@ -147,6 +156,7 @@ class __$$ExpenseModelImplCopyWithImpl<$Res>
     Object? note = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
+    Object? metadata = freezed,
   }) {
     return _then(_$ExpenseModelImpl(
       id: null == id
@@ -177,6 +187,10 @@ class __$$ExpenseModelImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      metadata: freezed == metadata
+          ? _value._metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -191,8 +205,10 @@ class _$ExpenseModelImpl extends _ExpenseModel {
       @HiveField(3) required this.date,
       @HiveField(4) this.note,
       @HiveField(5) required this.createdAt,
-      @HiveField(6) this.updatedAt})
-      : super._();
+      @HiveField(6) this.updatedAt,
+      @HiveField(7) final Map<String, dynamic>? metadata})
+      : _metadata = metadata,
+        super._();
 
   factory _$ExpenseModelImpl.fromJson(Map<String, dynamic> json) =>
       _$$ExpenseModelImplFromJson(json);
@@ -218,10 +234,20 @@ class _$ExpenseModelImpl extends _ExpenseModel {
   @override
   @HiveField(6)
   final DateTime? updatedAt;
+  final Map<String, dynamic>? _metadata;
+  @override
+  @HiveField(7)
+  Map<String, dynamic>? get metadata {
+    final value = _metadata;
+    if (value == null) return null;
+    if (_metadata is EqualUnmodifiableMapView) return _metadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'ExpenseModel(id: $id, amount: $amount, category: $category, date: $date, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'ExpenseModel(id: $id, amount: $amount, category: $category, date: $date, note: $note, createdAt: $createdAt, updatedAt: $updatedAt, metadata: $metadata)';
   }
 
   @override
@@ -238,13 +264,14 @@ class _$ExpenseModelImpl extends _ExpenseModel {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, amount, category, date, note, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, amount, category, date, note,
+      createdAt, updatedAt, const DeepCollectionEquality().hash(_metadata));
 
   @JsonKey(ignore: true)
   @override
@@ -268,7 +295,8 @@ abstract class _ExpenseModel extends ExpenseModel {
       @HiveField(3) required final DateTime date,
       @HiveField(4) final String? note,
       @HiveField(5) required final DateTime createdAt,
-      @HiveField(6) final DateTime? updatedAt}) = _$ExpenseModelImpl;
+      @HiveField(6) final DateTime? updatedAt,
+      @HiveField(7) final Map<String, dynamic>? metadata}) = _$ExpenseModelImpl;
   const _ExpenseModel._() : super._();
 
   factory _ExpenseModel.fromJson(Map<String, dynamic> json) =
@@ -295,6 +323,9 @@ abstract class _ExpenseModel extends ExpenseModel {
   @override
   @HiveField(6)
   DateTime? get updatedAt;
+  @override
+  @HiveField(7)
+  Map<String, dynamic>? get metadata;
   @override
   @JsonKey(ignore: true)
   _$$ExpenseModelImplCopyWith<_$ExpenseModelImpl> get copyWith =>

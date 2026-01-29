@@ -15,6 +15,7 @@ class AddEditExpenseScreen extends ConsumerStatefulWidget {
   final String? initialCategory;
   final DateTime? initialDate;
   final String? initialNote;
+  final Map<String, dynamic>? initialMetadata;
 
   const AddEditExpenseScreen({
     super.key,
@@ -23,6 +24,7 @@ class AddEditExpenseScreen extends ConsumerStatefulWidget {
     this.initialCategory,
     this.initialDate,
     this.initialNote,
+    this.initialMetadata,
   });
 
   bool get isEditing => expenseId != null;
@@ -50,7 +52,27 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
       _amountController.text = widget.initialAmount!.toStringAsFixed(2);
     }
     if (widget.initialCategory != null) {
-      _selectedCategory = widget.initialCategory;
+      if (AppConstants.expenseCategories.contains(widget.initialCategory)) {
+        _selectedCategory = widget.initialCategory;
+      } else {
+        // Handle legacy/invalid categories by migrating them
+        switch (widget.initialCategory) {
+          case 'Food':
+            _selectedCategory = 'Food & Dining';
+            break;
+          case 'Transport':
+            _selectedCategory = 'Transportation';
+            break;
+          case 'Health':
+            _selectedCategory = 'Healthcare';
+            break;
+          case 'Bills':
+            _selectedCategory = 'Bills & Utilities';
+            break;
+          default:
+            _selectedCategory = 'Others';
+        }
+      }
     }
     if (widget.initialDate != null) {
       _selectedDate = widget.initialDate!;
@@ -267,7 +289,28 @@ class _AddEditExpenseScreenState extends ConsumerState<AddEditExpenseScreen> {
               maxLength: AppConstants.maxNoteLength,
               validator: ValidationUtils.validateNote,
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+
+            if (widget.initialMetadata != null &&
+                widget.initialMetadata!['items'] != null) ...[
+              const Text(
+                'Grocery Items',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              ...((widget.initialMetadata!['items'] as List).map((e) {
+                final item = e as Map<String, dynamic>; // assuming Map
+                // Depending on generic, might be casting issue if from JSON decode
+                return Card(
+                  child: ListTile(
+                    dense: true,
+                    title: Text(item['name'] ?? 'Unknown'),
+                    trailing: Text('₹${item['price']}'),
+                  ),
+                );
+              })),
+              const SizedBox(height: 16),
+            ],
 
             // Save Button
             FilledButton.icon(

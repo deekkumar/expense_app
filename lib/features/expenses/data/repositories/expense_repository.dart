@@ -30,8 +30,8 @@ class ExpenseRepository {
   ExpenseRepository({
     required ExpenseLocalDataSource localDataSource,
     Uuid? uuid,
-  })  : _localDataSource = localDataSource,
-        _uuid = uuid ?? const Uuid();
+  }) : _localDataSource = localDataSource,
+       _uuid = uuid ?? const Uuid();
 
   /// Create a new expense
   ///
@@ -46,6 +46,7 @@ class ExpenseRepository {
     required String category,
     required DateTime date,
     String? note,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       // Create domain entity
@@ -57,17 +58,13 @@ class ExpenseRepository {
         note: note?.trim().isEmpty ?? true ? null : note!.trim(),
         createdAt: DateTime.now(),
         updatedAt: null,
+        metadata: metadata,
       );
 
       // Validate business rules
       final validationError = entity.validate();
       if (validationError != null) {
-        return (
-          null,
-          Failure.validation(
-            message: validationError,
-          ),
-        );
+        return (null, Failure.validation(message: validationError));
       }
 
       // Convert to model and persist
@@ -78,10 +75,7 @@ class ExpenseRepository {
     } catch (e) {
       return (
         null,
-        Failure.storage(
-          message: 'Failed to create expense',
-          error: e,
-        ),
+        Failure.storage(message: 'Failed to create expense', error: e),
       );
     }
   }
@@ -95,6 +89,7 @@ class ExpenseRepository {
     required String category,
     required DateTime date,
     String? note,
+    Map<String, dynamic>? metadata,
   }) async {
     try {
       // Check if expense exists
@@ -102,10 +97,7 @@ class ExpenseRepository {
       if (existing == null) {
         return (
           null,
-          Failure.notFound(
-            message: 'Expense not found',
-            resourceId: id,
-          ),
+          Failure.notFound(message: 'Expense not found', resourceId: id),
         );
       }
 
@@ -118,17 +110,13 @@ class ExpenseRepository {
         note: note?.trim().isEmpty ?? true ? null : note!.trim(),
         createdAt: existing.createdAt,
         updatedAt: DateTime.now(),
+        metadata: metadata,
       );
 
       // Validate business rules
       final validationError = entity.validate();
       if (validationError != null) {
-        return (
-          null,
-          Failure.validation(
-            message: validationError,
-          ),
-        );
+        return (null, Failure.validation(message: validationError));
       }
 
       // Convert to model and persist
@@ -139,10 +127,7 @@ class ExpenseRepository {
     } catch (e) {
       return (
         null,
-        Failure.storage(
-          message: 'Failed to update expense',
-          error: e,
-        ),
+        Failure.storage(message: 'Failed to update expense', error: e),
       );
     }
   }
@@ -155,10 +140,7 @@ class ExpenseRepository {
       await _localDataSource.deleteExpense(id);
       return null;
     } catch (e) {
-      return Failure.storage(
-        message: 'Failed to delete expense',
-        error: e,
-      );
+      return Failure.storage(message: 'Failed to delete expense', error: e);
     }
   }
 
@@ -180,10 +162,7 @@ class ExpenseRepository {
     } catch (e) {
       return (
         null,
-        Failure.storage(
-          message: 'Failed to load expenses',
-          error: e,
-        ),
+        Failure.storage(message: 'Failed to load expenses', error: e),
       );
     }
   }
@@ -196,10 +175,7 @@ class ExpenseRepository {
       if (model == null) {
         return (
           null,
-          Failure.notFound(
-            message: 'Expense not found',
-            resourceId: id,
-          ),
+          Failure.notFound(message: 'Expense not found', resourceId: id),
         );
       }
 
@@ -207,10 +183,7 @@ class ExpenseRepository {
     } catch (e) {
       return (
         null,
-        Failure.storage(
-          message: 'Failed to load expense',
-          error: e,
-        ),
+        Failure.storage(message: 'Failed to load expense', error: e),
       );
     }
   }
@@ -230,10 +203,7 @@ class ExpenseRepository {
     } catch (e) {
       return (
         null,
-        Failure.storage(
-          message: 'Failed to load expenses for month',
-          error: e,
-        ),
+        Failure.storage(message: 'Failed to load expenses for month', error: e),
       );
     }
   }

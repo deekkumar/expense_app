@@ -124,14 +124,15 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
                         category: e.category,
                         date: e.date,
                         note: e.note,
-                        onEdit: () => context.goNamed(
+                        onEdit: () => context.pushNamed(
                           'edit-expense',
                           pathParameters: {'id': e.id},
                           extra: {
                             'amount': e.amount,
                             'category': e.category,
-                            'date': e.date,
+                            'date': e.date.millisecondsSinceEpoch,
                             'note': e.note,
+                            'metadata': e.metadata,
                           },
                         ),
                         onDelete: () => ref
@@ -165,7 +166,7 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
               subtitle: const Text('Add a standard one-time expense'),
               onTap: () {
                 context.pop();
-                context.goNamed('add-expense');
+                context.pushNamed('add-expense');
               },
             ),
             ListTile(
@@ -174,7 +175,7 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
               subtitle: const Text('Record multiple items as one entry'),
               onTap: () {
                 context.pop();
-                context.goNamed('add-grocery');
+                context.pushNamed('add-grocery');
               },
             ),
             const SizedBox(height: 16),

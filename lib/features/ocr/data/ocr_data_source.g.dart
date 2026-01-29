@@ -1,26 +1,25 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'grocery_notifier.dart';
+part of 'ocr_data_source.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$groceryNotifierHash() => r'12383f7ce7db8bdcfafb437463ae8f0f1a698048';
+String _$ocrDataSourceHash() => r'd4c3ce4e8ad0be256ff66e7a28423a87f068963d';
 
-/// See also [GroceryNotifier].
-@ProviderFor(GroceryNotifier)
-final groceryNotifierProvider =
-    AutoDisposeNotifierProvider<GroceryNotifier, GrocerySessionState>.internal(
-  GroceryNotifier.new,
-  name: r'groceryNotifierProvider',
+/// See also [ocrDataSource].
+@ProviderFor(ocrDataSource)
+final ocrDataSourceProvider = AutoDisposeProvider<OCRDataSource>.internal(
+  ocrDataSource,
+  name: r'ocrDataSourceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$groceryNotifierHash,
+      : _$ocrDataSourceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$GroceryNotifier = AutoDisposeNotifier<GrocerySessionState>;
+typedef OcrDataSourceRef = AutoDisposeProviderRef<OCRDataSource>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

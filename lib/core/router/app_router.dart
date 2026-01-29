@@ -8,6 +8,7 @@ import 'package:smart_expense_tracker/features/expenses/presentation/screens/exp
 import 'package:smart_expense_tracker/features/expenses/presentation/screens/add_edit_expense_screen.dart';
 import 'package:smart_expense_tracker/features/settings/presentation/screens/settings_screen.dart';
 import 'package:smart_expense_tracker/features/grocery/presentation/screens/grocery_session_screen.dart';
+import 'package:smart_expense_tracker/features/ocr/presentation/screens/ocr_scan_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _shellNavigatorExpenseKey = GlobalKey<NavigatorState>(
@@ -60,8 +61,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                         expenseId: id,
                         initialAmount: extras['amount'] as double?,
                         initialCategory: extras['category'] as String?,
-                        initialDate: extras['date'] as DateTime?,
+                        initialDate: extras['date'] != null
+                            ? DateTime.fromMillisecondsSinceEpoch(
+                                extras['date'] as int,
+                              )
+                            : null,
                         initialNote: extras['note'] as String?,
+                        initialMetadata:
+                            extras['metadata'] as Map<String, dynamic>?,
                       );
                     },
                   ),
@@ -112,6 +119,13 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         path: '/grocery/add',
         name: 'add-grocery',
         builder: (context, state) => const GrocerySessionScreen(),
+        routes: [
+          GoRoute(
+            path: 'ocr',
+            name: 'grocery-ocr',
+            builder: (context, state) => const OCRScanScreen(),
+          ),
+        ],
       ),
     ],
   );

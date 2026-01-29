@@ -23,6 +23,7 @@ mixin _$ExpenseEntity {
   String? get note => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  Map<String, dynamic>? get metadata => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $ExpenseEntityCopyWith<ExpenseEntity> get copyWith =>
@@ -42,7 +43,8 @@ abstract class $ExpenseEntityCopyWith<$Res> {
       DateTime date,
       String? note,
       DateTime createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      Map<String, dynamic>? metadata});
 }
 
 /// @nodoc
@@ -65,6 +67,7 @@ class _$ExpenseEntityCopyWithImpl<$Res, $Val extends ExpenseEntity>
     Object? note = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
+    Object? metadata = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -95,6 +98,10 @@ class _$ExpenseEntityCopyWithImpl<$Res, $Val extends ExpenseEntity>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      metadata: freezed == metadata
+          ? _value.metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ) as $Val);
   }
 }
@@ -114,7 +121,8 @@ abstract class _$$ExpenseEntityImplCopyWith<$Res>
       DateTime date,
       String? note,
       DateTime createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      Map<String, dynamic>? metadata});
 }
 
 /// @nodoc
@@ -135,6 +143,7 @@ class __$$ExpenseEntityImplCopyWithImpl<$Res>
     Object? note = freezed,
     Object? createdAt = null,
     Object? updatedAt = freezed,
+    Object? metadata = freezed,
   }) {
     return _then(_$ExpenseEntityImpl(
       id: null == id
@@ -165,6 +174,10 @@ class __$$ExpenseEntityImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      metadata: freezed == metadata
+          ? _value._metadata
+          : metadata // ignore: cast_nullable_to_non_nullable
+              as Map<String, dynamic>?,
     ));
   }
 }
@@ -179,8 +192,10 @@ class _$ExpenseEntityImpl extends _ExpenseEntity {
       required this.date,
       this.note,
       required this.createdAt,
-      this.updatedAt})
-      : super._();
+      this.updatedAt,
+      final Map<String, dynamic>? metadata})
+      : _metadata = metadata,
+        super._();
 
   @override
   final String id;
@@ -196,10 +211,19 @@ class _$ExpenseEntityImpl extends _ExpenseEntity {
   final DateTime createdAt;
   @override
   final DateTime? updatedAt;
+  final Map<String, dynamic>? _metadata;
+  @override
+  Map<String, dynamic>? get metadata {
+    final value = _metadata;
+    if (value == null) return null;
+    if (_metadata is EqualUnmodifiableMapView) return _metadata;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(value);
+  }
 
   @override
   String toString() {
-    return 'ExpenseEntity(id: $id, amount: $amount, category: $category, date: $date, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'ExpenseEntity(id: $id, amount: $amount, category: $category, date: $date, note: $note, createdAt: $createdAt, updatedAt: $updatedAt, metadata: $metadata)';
   }
 
   @override
@@ -216,12 +240,13 @@ class _$ExpenseEntityImpl extends _ExpenseEntity {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            const DeepCollectionEquality().equals(other._metadata, _metadata));
   }
 
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, amount, category, date, note, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, amount, category, date, note,
+      createdAt, updatedAt, const DeepCollectionEquality().hash(_metadata));
 
   @JsonKey(ignore: true)
   @override
@@ -238,7 +263,8 @@ abstract class _ExpenseEntity extends ExpenseEntity {
       required final DateTime date,
       final String? note,
       required final DateTime createdAt,
-      final DateTime? updatedAt}) = _$ExpenseEntityImpl;
+      final DateTime? updatedAt,
+      final Map<String, dynamic>? metadata}) = _$ExpenseEntityImpl;
   const _ExpenseEntity._() : super._();
 
   @override
@@ -255,6 +281,8 @@ abstract class _ExpenseEntity extends ExpenseEntity {
   DateTime get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  Map<String, dynamic>? get metadata;
   @override
   @JsonKey(ignore: true)
   _$$ExpenseEntityImplCopyWith<_$ExpenseEntityImpl> get copyWith =>

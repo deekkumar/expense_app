@@ -11,12 +11,14 @@ class AppConstants {
   static const String monthYearFormat = 'MMMM y';
 
   // Formatting & Limits
-  static const String currencySymbol = '\$';
+  // Formatting & Limits
+  static const String currencySymbol = '₹';
   static const double maxExpenseAmount = 1000000.0;
   static const int maxNoteLength = 500;
 
   // Categories & Icons
   static const List<String> expenseCategories = [
+    'Grocery',
     'Food & Dining',
     'Transportation',
     'Shopping',
@@ -30,6 +32,7 @@ class AppConstants {
   ];
 
   static const Map<String, int> categoryIcons = {
+    'Grocery': 0xe84f, // shopping_basket
     'Food & Dining': 0xe57f,
     'Transportation': 0xe531,
     'Shopping': 0xe59c,

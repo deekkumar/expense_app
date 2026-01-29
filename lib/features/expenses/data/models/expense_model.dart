@@ -29,6 +29,7 @@ class ExpenseModel with _$ExpenseModel {
     @HiveField(4) String? note,
     @HiveField(5) required DateTime createdAt,
     @HiveField(6) DateTime? updatedAt,
+    @HiveField(7) Map<String, dynamic>? metadata,
   }) = _ExpenseModel;
 
   /// Convert from JSON (future-proofing for API sync)
@@ -46,6 +47,7 @@ class ExpenseModel with _$ExpenseModel {
       note: note,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      metadata: metadata,
     );
   }
 
@@ -60,6 +62,7 @@ class ExpenseModel with _$ExpenseModel {
       note: entity.note,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      metadata: entity.metadata,
     );
   }
 

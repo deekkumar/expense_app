@@ -23,6 +23,7 @@ class ExpenseEntity with _$ExpenseEntity {
     String? note,
     required DateTime createdAt,
     DateTime? updatedAt,
+    Map<String, dynamic>? metadata,
   }) = _ExpenseEntity;
 
   /// Business Logic: Check if expense is from today
