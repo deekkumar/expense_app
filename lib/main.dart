@@ -9,6 +9,8 @@ import 'features/grocery/data/local/grocery_preferences_local_data_source.dart';
 import 'features/grocery/presentation/providers/grocery_notifier.dart';
 import 'features/settings/data/local/settings_local_data_source.dart';
 import 'features/settings/presentation/providers/settings_providers.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:smart_expense_tracker/core/constants/app_constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,20 +22,25 @@ void main() async {
   // Initialize Data Sources (Handles Hive initialization and adapters internally)
   final localDataSource = ExpenseLocalDataSource();
   await localDataSource.init();
-  
+
   // Initialize Grocery Preferences Data Source
   final groceryPreferencesDataSource = GroceryPreferencesLocalDataSource();
   await groceryPreferencesDataSource.init();
-  
+
   // Initialize Settings Data Source
   final settingsDataSource = SettingsLocalDataSource();
   await settingsDataSource.init();
+
+  // Open Budget Box
+  await Hive.openBox(AppConstants.budgetBoxName);
 
   runApp(
     ProviderScope(
       overrides: [
         expenseLocalDataSourceProvider.overrideWithValue(localDataSource),
-        groceryPreferencesDataSourceProvider.overrideWithValue(groceryPreferencesDataSource),
+        groceryPreferencesDataSourceProvider.overrideWithValue(
+          groceryPreferencesDataSource,
+        ),
         settingsLocalDataSourceProvider.overrideWithValue(settingsDataSource),
       ],
       observers: const [LoggerObserver()],
