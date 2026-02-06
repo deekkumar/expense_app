@@ -20,6 +20,8 @@ mixin _$GrocerySessionState {
   double get totalAmount => throw _privateConstructorUsedError;
   bool get isSubmitting => throw _privateConstructorUsedError;
   String? get storeName => throw _privateConstructorUsedError;
+  GrocerySessionMode get mode => throw _privateConstructorUsedError;
+  String? get expenseId => throw _privateConstructorUsedError;
 
   @JsonKey(ignore: true)
   $GrocerySessionStateCopyWith<GrocerySessionState> get copyWith =>
@@ -36,7 +38,9 @@ abstract class $GrocerySessionStateCopyWith<$Res> {
       {List<GroceryItem> items,
       double totalAmount,
       bool isSubmitting,
-      String? storeName});
+      String? storeName,
+      GrocerySessionMode mode,
+      String? expenseId});
 }
 
 /// @nodoc
@@ -56,6 +60,8 @@ class _$GrocerySessionStateCopyWithImpl<$Res, $Val extends GrocerySessionState>
     Object? totalAmount = null,
     Object? isSubmitting = null,
     Object? storeName = freezed,
+    Object? mode = null,
+    Object? expenseId = freezed,
   }) {
     return _then(_value.copyWith(
       items: null == items
@@ -74,6 +80,14 @@ class _$GrocerySessionStateCopyWithImpl<$Res, $Val extends GrocerySessionState>
           ? _value.storeName
           : storeName // ignore: cast_nullable_to_non_nullable
               as String?,
+      mode: null == mode
+          ? _value.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as GrocerySessionMode,
+      expenseId: freezed == expenseId
+          ? _value.expenseId
+          : expenseId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ) as $Val);
   }
 }
@@ -90,7 +104,9 @@ abstract class _$$GrocerySessionStateImplCopyWith<$Res>
       {List<GroceryItem> items,
       double totalAmount,
       bool isSubmitting,
-      String? storeName});
+      String? storeName,
+      GrocerySessionMode mode,
+      String? expenseId});
 }
 
 /// @nodoc
@@ -108,6 +124,8 @@ class __$$GrocerySessionStateImplCopyWithImpl<$Res>
     Object? totalAmount = null,
     Object? isSubmitting = null,
     Object? storeName = freezed,
+    Object? mode = null,
+    Object? expenseId = freezed,
   }) {
     return _then(_$GrocerySessionStateImpl(
       items: null == items
@@ -126,6 +144,14 @@ class __$$GrocerySessionStateImplCopyWithImpl<$Res>
           ? _value.storeName
           : storeName // ignore: cast_nullable_to_non_nullable
               as String?,
+      mode: null == mode
+          ? _value.mode
+          : mode // ignore: cast_nullable_to_non_nullable
+              as GrocerySessionMode,
+      expenseId: freezed == expenseId
+          ? _value.expenseId
+          : expenseId // ignore: cast_nullable_to_non_nullable
+              as String?,
     ));
   }
 }
@@ -137,7 +163,9 @@ class _$GrocerySessionStateImpl extends _GrocerySessionState {
       {final List<GroceryItem> items = const [],
       this.totalAmount = 0.0,
       this.isSubmitting = false,
-      this.storeName = ''})
+      this.storeName = '',
+      this.mode = GrocerySessionMode.create,
+      this.expenseId})
       : _items = items,
         super._();
 
@@ -159,10 +187,15 @@ class _$GrocerySessionStateImpl extends _GrocerySessionState {
   @override
   @JsonKey()
   final String? storeName;
+  @override
+  @JsonKey()
+  final GrocerySessionMode mode;
+  @override
+  final String? expenseId;
 
   @override
   String toString() {
-    return 'GrocerySessionState(items: $items, totalAmount: $totalAmount, isSubmitting: $isSubmitting, storeName: $storeName)';
+    return 'GrocerySessionState(items: $items, totalAmount: $totalAmount, isSubmitting: $isSubmitting, storeName: $storeName, mode: $mode, expenseId: $expenseId)';
   }
 
   @override
@@ -176,7 +209,10 @@ class _$GrocerySessionStateImpl extends _GrocerySessionState {
             (identical(other.isSubmitting, isSubmitting) ||
                 other.isSubmitting == isSubmitting) &&
             (identical(other.storeName, storeName) ||
-                other.storeName == storeName));
+                other.storeName == storeName) &&
+            (identical(other.mode, mode) || other.mode == mode) &&
+            (identical(other.expenseId, expenseId) ||
+                other.expenseId == expenseId));
   }
 
   @override
@@ -185,7 +221,9 @@ class _$GrocerySessionStateImpl extends _GrocerySessionState {
       const DeepCollectionEquality().hash(_items),
       totalAmount,
       isSubmitting,
-      storeName);
+      storeName,
+      mode,
+      expenseId);
 
   @JsonKey(ignore: true)
   @override
@@ -200,7 +238,9 @@ abstract class _GrocerySessionState extends GrocerySessionState {
       {final List<GroceryItem> items,
       final double totalAmount,
       final bool isSubmitting,
-      final String? storeName}) = _$GrocerySessionStateImpl;
+      final String? storeName,
+      final GrocerySessionMode mode,
+      final String? expenseId}) = _$GrocerySessionStateImpl;
   const _GrocerySessionState._() : super._();
 
   @override
@@ -211,6 +251,10 @@ abstract class _GrocerySessionState extends GrocerySessionState {
   bool get isSubmitting;
   @override
   String? get storeName;
+  @override
+  GrocerySessionMode get mode;
+  @override
+  String? get expenseId;
   @override
   @JsonKey(ignore: true)
   _$$GrocerySessionStateImplCopyWith<_$GrocerySessionStateImpl> get copyWith =>

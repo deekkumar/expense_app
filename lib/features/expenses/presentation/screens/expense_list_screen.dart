@@ -5,6 +5,7 @@ import 'package:smart_expense_tracker/core/utils/utils.dart';
 import 'package:smart_expense_tracker/features/expenses/presentation/providers/expense_providers.dart';
 import 'package:smart_expense_tracker/features/expenses/presentation/widgets/expense_widgets.dart';
 import 'package:smart_expense_tracker/features/quick_expense/presentation/widgets/quick_expense_sheet.dart';
+import 'package:smart_expense_tracker/features/grocery/presentation/providers/grocery_notifier.dart';
 import 'package:smart_expense_tracker/features/spending_intelligence/presentation/widgets/smart_insights_section.dart';
 
 class ExpenseListScreen extends ConsumerStatefulWidget {
@@ -135,20 +136,68 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
                           category: e.category,
                           date: e.date,
                           note: e.note,
-                          onEdit: () => context.pushNamed(
-                            'edit-expense',
-                            pathParameters: {'id': e.id},
-                            extra: {
-                              'amount': e.amount,
-                              'category': e.category,
-                              'date': e.date.millisecondsSinceEpoch,
-                              'note': e.note,
-                              'metadata': e.metadata,
-                            },
-                          ),
-                          onDelete: () => ref
-                              .read(expensesProvider.notifier)
-                              .deleteExpense(e.id),
+                          onEdit: () {
+                            if (e.category == 'Grocery') {
+                              context.pushNamed('add-grocery', extra: e.id);
+                            } else {
+                              context.pushNamed(
+                                'edit-expense',
+                                pathParameters: {'id': e.id},
+                                extra: {
+                                  'amount': e.amount,
+                                  'category': e.category,
+                                  'date': e.date.millisecondsSinceEpoch,
+                                  'note': e.note,
+                                  'metadata': e.metadata,
+                                },
+                              );
+                            }
+                          },
+                          onDelete: () async {
+                            if (e.category == 'Grocery') {
+                              final confirm = await showDialog<bool>(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Delete Grocery Expense?'),
+                                  content: const Text(
+                                    'This will remove all items from this grocery entry.',
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, false),
+                                      child: const Text('Cancel'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(color: Colors.red),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+
+                              if (confirm == true) {
+                                await ref
+                                    .read(expensesProvider.notifier)
+                                    .deleteExpense(e.id);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Grocery expense deleted'),
+                                    ),
+                                  );
+                                }
+                              }
+                            } else {
+                              ref
+                                  .read(expensesProvider.notifier)
+                                  .deleteExpense(e.id);
+                            }
+                          },
                         ),
                       ),
                     ],
@@ -229,6 +278,7 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
               subtitle: const Text('Record multiple items as one entry'),
               onTap: () {
                 context.pop();
+                ref.read(groceryNotifierProvider.notifier).resetSession();
                 context.pushNamed('add-grocery');
               },
             ),

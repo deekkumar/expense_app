@@ -8,7 +8,8 @@ import '../providers/grocery_state.dart';
 import '../../domain/entities/grocery_item.dart';
 
 class GrocerySessionScreen extends ConsumerStatefulWidget {
-  const GrocerySessionScreen({super.key});
+  final String? expenseId;
+  const GrocerySessionScreen({super.key, this.expenseId});
 
   @override
   ConsumerState<GrocerySessionScreen> createState() =>
@@ -26,8 +27,14 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize store name if not already set
+    // Initialize store name or full session if in edit mode
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.expenseId != null) {
+        ref
+            .read(groceryNotifierProvider.notifier)
+            .initEditMode(widget.expenseId!);
+      }
+
       final state = ref.read(groceryNotifierProvider);
       if (state.storeName != null) {
         _storeNameController.text = state.storeName!;
@@ -66,7 +73,13 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
     final settings = ref.watch(appSettingsNotifierProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('New Grocery Session')),
+      appBar: AppBar(
+        title: Text(
+          state.mode == GrocerySessionMode.edit
+              ? 'Edit Grocery Session'
+              : 'New Grocery Session',
+        ),
+      ),
       body: Column(
         children: [
           // Sticky Header - Store Info
@@ -464,9 +477,11 @@ class _GrocerySessionScreenState extends ConsumerState<GrocerySessionScreen> {
                           color: Colors.white,
                         ),
                       )
-                    : const Text(
-                        'Complete Purchase',
-                        style: TextStyle(
+                    : Text(
+                        state.mode == GrocerySessionMode.edit
+                            ? 'Update Purchase'
+                            : 'Complete Purchase',
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),

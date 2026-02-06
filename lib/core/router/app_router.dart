@@ -118,7 +118,10 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/grocery/add',
         name: 'add-grocery',
-        builder: (context, state) => const GrocerySessionScreen(),
+        builder: (context, state) {
+          final expenseId = state.extra as String?;
+          return GrocerySessionScreen(expenseId: expenseId);
+        },
         routes: [
           GoRoute(
             path: 'ocr',

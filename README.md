@@ -1,48 +1,100 @@
-# Smart Expense Tracker Pro
+# Smart Expense Tracker Pro 🚀
 
-A production-grade, offline-first Flutter application for tracking personal finances.
+A production-grade, offline-first, and intelligence-driven Flutter application for comprehensive personal finance management.
 
-## Architecture
+---
 
-- **Clean Architecture** (Feature-based)
-- **State Management**: Riverpod 3.x
-- **Navigation**: GoRouter (ShellRoute)
-- **Database**: Hive (Offline-first)
-- **Background Tasks**: Workmanager (Daily recurring expenses)
-- **Charts**: fl_chart
-- **Security**: local_auth (Biometrics)
+## ✨ Key Features
 
-## Setup Instructions
+### 🧠 AI Spending Intelligence
 
-1.  **Install Dependencies**:
+- **Anomaly Detection**: Automatically identifies unusual spending patterns using statistical Z-Score analysis.
+- **Budget Burn Prediction**: Predicts when you will reach your budget limit based on current velocity.
+- **Category Dominance**: Real-time insights into which categories are consuming your wealth.
+
+### 🔍 OCR & Quick Entry
+
+- **One-Tap Scanning**: High-accuracy OCR powered by Google ML Kit to extract amounts and tax from receipts.
+- **Grocery Sessions**: A dedicated mode for bulk-adding grocery items with real-time budget tracking.
+
+### 📊 Elite Analytics
+
+- **Dynamic Visualizations**: Interactive charts powered by `fl_chart` with smooth transitions.
+- **Spending Trends**: Compare current spending against historical data.
+
+### 🛡️ Privacy & Reliability
+
+- **Offline-First**: Powered by Hive for instantaneous data access without internet.
+- **Biometric Security**: Secure your financial data with FaceID/Fingerprint.
+- **Automated Backups**: Background tasks handle recurring expenses and data integrity.
+
+---
+
+## 🛠 Tech Stack
+
+- **Core**: [Flutter](https://flutter.dev) (Latest Stable)
+- **Architecture**: Clean Architecture (Feature-driven)
+- **State Management**: [Riverpod 2.x](https://riverpod.dev) with Code Generation
+- **Local Storage**: [Hive](https://pub.dev/packages/hive) (Fast NoSQL)
+- **Navigation**: [GoRouter](https://pub.dev/packages/go_router) (Declarative Routing)
+- **AI/ML**: Google ML Kit (Text Recognition)
+- **Visuals**: `fl_chart`, `google_fonts`, `flutter_animate`
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Flutter SDK (^3.10.4)
+- Dart SDK
+
+### Setup Instructions
+
+1.  **Clone & Fetch Dependencies**:
+
     ```bash
+    git clone https://github.com/dipakrana844/expense_app.git
+    cd expense_app
     flutter pub get
     ```
 
-2.  **Generate Code (Crucial)**:
-    This project uses `freezed`, `hive`, and `riverpod`. You MUST run the build runner to generate the necessary files (Models, Adapters).
+2.  **Generate Core Logic (Crucial)**:
+    This project uses `freezed`, `hive`, and `riverpod_generator`. You MUST run the build runner to generate models and adapters.
+
     ```bash
     flutter pub run build_runner build --delete-conflicting-outputs
     ```
 
-3.  **Run the App**:
+3.  **Run Application**:
     ```bash
     flutter run
     ```
 
-## Features Implemented
+---
 
-1.  **Smart Scheduling**: Recurring expenses are handled by `Workmanager` in the background (Daily check).
-2.  **Analytics**: Interactive charts using `fl_chart`.
-3.  **Budgeting**: Set monthly limits and get visual alerts (80% / 100% usage).
-4.  **Exports**: Export data to CSV and share.
-5.  **Security**: App Lock with Biometrics.
+## 📂 Project Structure
 
-## Project Structure
+```text
+lib/
+├── core/               # Shared utilities, routing, and global services
+├── features/
+│   ├── expenses/       # Core CRUD and recurring logic
+│   ├── spending_intelligence/ # AI engine and insight logic
+│   ├── ocr/            # Receipt scanning functionality
+│   ├── grocery/        # specialized bulk entry mode
+│   ├── analytics/      # fl_chart implementations
+│   ├── budget/         # Limit monitoring and alerts
+│   └── settings/       # App config and security
+└── main.dart           # DI initialization and app entry
+```
 
-- `lib/core`: Shared utilities, Router, Theme, Services (Background, Export, Security).
-- `lib/features`:
-    - `expenses`: Main CRUD, Listing, Scheduling.
-    - `analytics`: Visualization and Stats.
-    - `budget`: Logic for monitoring limits.
-    - `settings`: App configuration.
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

@@ -63,6 +63,36 @@ class GroceryNotifier extends _$GroceryNotifier {
     }
   }
 
+  void initEditMode(String expenseId) {
+    final repository = ref.read(expenseRepositoryProvider);
+    final (expense, error) = repository.getExpenseById(expenseId);
+
+    if (error != null || expense == null) return;
+
+    final metadata = expense.metadata;
+    if (metadata == null) return;
+
+    final storeName = metadata['storeName'] as String? ?? '';
+    final itemsList = metadata['items'] as List<dynamic>? ?? [];
+
+    final items = itemsList.map((e) {
+      final map = e as Map<dynamic, dynamic>;
+      return GroceryItem(
+        id: const Uuid().v4(),
+        name: map['name'] as String? ?? '',
+        price: (map['price'] as num?)?.toDouble() ?? 0.0,
+      );
+    }).toList();
+
+    state = GrocerySessionState(
+      expenseId: expenseId,
+      mode: GrocerySessionMode.edit,
+      storeName: storeName,
+      items: items,
+      totalAmount: _calculateTotal(items),
+    );
+  }
+
   void addItems(List<GroceryItem> newItems) {
     if (newItems.isEmpty) return;
 
@@ -120,13 +150,25 @@ class GroceryNotifier extends _$GroceryNotifier {
             .toList(),
       };
 
-      await repository.createExpense(
-        amount: state.totalAmount,
-        category: 'Grocery',
-        date: DateTime.now(),
-        note: "Grocery at $storeName",
-        metadata: metadata,
-      );
+      if (state.mode == GrocerySessionMode.edit && state.expenseId != null) {
+        await repository.updateExpense(
+          id: state.expenseId!,
+          amount: state.totalAmount,
+          category: 'Grocery',
+          date:
+              DateTime.now(), // Or preserve original date? User said "update the SAME expense entry"
+          note: "Grocery at $storeName",
+          metadata: metadata,
+        );
+      } else {
+        await repository.createExpense(
+          amount: state.totalAmount,
+          category: 'Grocery',
+          date: DateTime.now(),
+          note: "Grocery at $storeName",
+          metadata: metadata,
+        );
+      }
 
       // On success, clear state
       state = const GrocerySessionState();
@@ -150,6 +192,9 @@ class GroceryNotifier extends _$GroceryNotifier {
   }
 
   void resetSession() {
-    state = const GrocerySessionState();
+    state = const GrocerySessionState(
+      mode: GrocerySessionMode.create,
+      expenseId: null,
+    );
   }
 }
