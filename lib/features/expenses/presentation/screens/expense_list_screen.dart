@@ -8,6 +8,7 @@ import 'package:smart_expense_tracker/features/quick_expense/presentation/widget
 import 'package:smart_expense_tracker/features/grocery/presentation/providers/grocery_notifier.dart';
 import 'package:smart_expense_tracker/features/spending_intelligence/presentation/widgets/smart_insights_section.dart';
 import 'package:smart_expense_tracker/features/daily_spend_guard/presentation/widgets/daily_spend_card.dart';
+import 'package:smart_expense_tracker/features/income/presentation/widgets/balance_summary_card.dart';
 
 class ExpenseListScreen extends ConsumerStatefulWidget {
   const ExpenseListScreen({super.key});
@@ -83,6 +84,10 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
           // Daily Spend Guard Card - Always visible at top
           const SliverToBoxAdapter(
             child: DailySpendCard(showFullDetails: true),
+          ),
+          // Balance Summary Card - Shows income/expense balance
+          const SliverToBoxAdapter(
+            child: BalanceSummaryCard(showDetailedMetrics: true),
           ),
           const SliverToBoxAdapter(child: SmartInsightsSection()),
           if (groupedExpenses.isEmpty)
@@ -269,12 +274,12 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
             ),
             const Divider(height: 1),
             ListTile(
-              leading: const Icon(Icons.receipt_long),
-              title: const Text('Single Expense'),
-              subtitle: const Text('Add with full details'),
+              leading: const Icon(Icons.payments, color: Colors.green),
+              title: const Text('Add Income'),
+              subtitle: const Text('Record money received'),
               onTap: () {
                 context.pop();
-                context.pushNamed('add-expense');
+                context.push('/income/add');
               },
             ),
             ListTile(

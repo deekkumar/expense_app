@@ -11,6 +11,8 @@ import 'features/settings/data/local/settings_local_data_source.dart';
 import 'features/settings/presentation/providers/settings_providers.dart';
 import 'features/daily_spend_guard/data/local/daily_spend_local_data_source.dart';
 import 'features/daily_spend_guard/presentation/providers/daily_spend_providers.dart';
+import 'features/income/data/local/income_local_data_source.dart';
+import 'features/income/presentation/providers/income_providers.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:smart_expense_tracker/core/constants/app_constants.dart';
 
@@ -25,6 +27,10 @@ void main() async {
   // Initialize Data Sources (Handles Hive initialization and adapters internally)
   final localDataSource = ExpenseLocalDataSource();
   await localDataSource.init();
+
+  // Initialize Income Data Source
+  final incomeDataSource = IncomeLocalDataSource();
+  await incomeDataSource.init();
 
   // Initialize Grocery Preferences Data Source
   final groceryPreferencesDataSource = GroceryPreferencesLocalDataSource();
@@ -45,6 +51,7 @@ void main() async {
     ProviderScope(
       overrides: [
         expenseLocalDataSourceProvider.overrideWithValue(localDataSource),
+        incomeLocalDataSourceProvider.overrideWithValue(incomeDataSource),
         groceryPreferencesDataSourceProvider.overrideWithValue(
           groceryPreferencesDataSource,
         ),

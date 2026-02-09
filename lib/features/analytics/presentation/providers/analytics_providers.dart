@@ -1,9 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:smart_expense_tracker/features/expenses/domain/entities/expense_entity.dart';
 import 'package:smart_expense_tracker/features/expenses/presentation/providers/expense_providers.dart';
+import 'package:smart_expense_tracker/features/income/domain/entities/income_entity.dart';
+import 'package:smart_expense_tracker/features/income/presentation/providers/income_providers.dart';
 import 'package:smart_expense_tracker/features/spending_intelligence/domain/entities/insight.dart';
 import 'package:smart_expense_tracker/features/spending_intelligence/domain/algorithms/spending_algorithms.dart';
 import 'package:smart_expense_tracker/features/budget/presentation/providers/budget_providers.dart';
+import 'package:smart_expense_tracker/core/services/balance_service.dart';
 
 /// Daily Snapshot Data
 class DailySnapshot {
@@ -213,5 +216,135 @@ final categoryActionInsightsProvider = Provider<Map<String, CategoryInsight>>((
       return insights;
     },
     orElse: () => {},
+  );
+});
+
+/// Enhanced Financial Analytics Data
+class FinancialAnalytics {
+  final double totalIncome;
+  final double totalExpenses;
+  final double netBalance;
+  final double savingsRate;
+  final FinancialHealth financialHealth;
+  final Map<String, double> incomeBySource;
+  final int balanceDepletionDays;
+
+  FinancialAnalytics({
+    required this.totalIncome,
+    required this.totalExpenses,
+    required this.netBalance,
+    required this.savingsRate,
+    required this.financialHealth,
+    required this.incomeBySource,
+    required this.balanceDepletionDays,
+  });
+
+  factory FinancialAnalytics.empty() => FinancialAnalytics(
+        totalIncome: 0.0,
+        totalExpenses: 0.0,
+        netBalance: 0.0,
+        savingsRate: 0.0,
+        financialHealth: FinancialHealth.poor,
+        incomeBySource: {},
+        balanceDepletionDays: 0,
+      );
+}
+
+/// Provider for Enhanced Financial Analytics
+final financialAnalyticsProvider = Provider<FinancialAnalytics>((ref) {
+  final incomesAsync = ref.watch(incomesProvider);
+  final expensesAsync = ref.watch(expensesProvider);
+  
+  return incomesAsync.when(
+    data: (incomes) => expensesAsync.when(
+      data: (expenses) {
+        final balanceService = BalanceService();
+        
+        final totalIncome = balanceService.getTotalIncome(incomes: incomes.cast<IncomeEntity>());
+        final totalExpenses = balanceService.getTotalExpenses(expenses: expenses.cast<ExpenseEntity>());
+        final netBalance = balanceService.getCurrentBalance(
+          incomes: incomes.cast<IncomeEntity>(),
+          expenses: expenses.cast<ExpenseEntity>(),
+        );
+        final savingsRate = balanceService.getSavingsRate(
+          incomes: incomes.cast<IncomeEntity>(),
+          expenses: expenses.cast<ExpenseEntity>(),
+        );
+        final financialHealth = balanceService.getFinancialHealth(
+          incomes: incomes.cast<IncomeEntity>(),
+          expenses: expenses.cast<ExpenseEntity>(),
+        );
+        final incomeBySource = balanceService.getIncomeSourceBreakdown(incomes.cast<IncomeEntity>());
+        
+        // Calculate balance depletion (assuming current daily spending rate)
+        final now = DateTime.now();
+        final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+        final recentExpenses = expenses.where((e) => e.date.isAfter(thirtyDaysAgo)).toList();
+        final dailySpendingRate = recentExpenses.fold<double>(0.0, (sum, e) => sum + e.amount) / 30;
+        final balanceDepletionDays = balanceService.getBalanceDepletionDays(
+          currentBalance: netBalance,
+          dailySpendingRate: dailySpendingRate,
+        ) ?? 0;
+
+        return FinancialAnalytics(
+          totalIncome: totalIncome,
+          totalExpenses: totalExpenses,
+          netBalance: netBalance,
+          savingsRate: savingsRate,
+          financialHealth: financialHealth,
+          incomeBySource: incomeBySource,
+          balanceDepletionDays: balanceDepletionDays,
+        );
+      },
+      loading: () => FinancialAnalytics.empty(),
+      error: (_, __) => FinancialAnalytics.empty(),
+    ),
+    loading: () => FinancialAnalytics.empty(),
+    error: (_, __) => FinancialAnalytics.empty(),
+  );
+});
+
+/// Provider for Income vs Expense Trend Data
+final incomeExpenseTrendProvider = Provider<Map<String, Map<String, double>>>((ref) {
+  final incomesAsync = ref.watch(incomesProvider);
+  final expensesAsync = ref.watch(expensesProvider);
+  
+  return incomesAsync.when(
+    data: (incomes) => expensesAsync.when(
+      data: (expenses) {
+        final trendData = <String, Map<String, double>>{};
+        
+        // Get last 6 months
+        final now = DateTime.now();
+        for (int i = 5; i >= 0; i--) {
+          final month = DateTime(now.year, now.month - i);
+          final monthKey = '${month.year}-${month.month.toString().padLeft(2, '0')}';
+          
+          // Calculate income for this month
+          final monthIncomes = incomes.where((income) => 
+            income.date.year == month.year && income.date.month == month.month
+          );
+          final totalIncome = monthIncomes.fold<double>(0.0, (sum, income) => sum + income.amount);
+          
+          // Calculate expenses for this month
+          final monthExpenses = expenses.where((expense) => 
+            expense.date.year == month.year && expense.date.month == month.month
+          );
+          final totalExpense = monthExpenses.fold<double>(0.0, (sum, expense) => sum + expense.amount);
+          
+          trendData[monthKey] = {
+            'income': totalIncome,
+            'expense': totalExpense,
+            'net': totalIncome - totalExpense,
+          };
+        }
+        
+        return trendData;
+      },
+      loading: () => {},
+      error: (_, __) => {},
+    ),
+    loading: () => {},
+    error: (_, __) => {},
   );
 });

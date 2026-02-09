@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:smart_expense_tracker/features/expenses/domain/entities/expense_entity.dart';
+import 'package:smart_expense_tracker/features/income/domain/entities/income_entity.dart';
 import 'package:smart_expense_tracker/core/constants/app_constants.dart';
 import '../entities/insight.dart';
 import 'dart:math';
@@ -183,5 +184,176 @@ class SpendingAlgorithms {
 
     // Return random helpful insight if data exists
     return null; // For now keeping it simple
+  }
+
+  /// 4. Income Consistency Analysis
+  /// Detects irregular income patterns
+  static Insight? analyzeIncomeConsistency(List<IncomeEntity> incomes) {
+    if (incomes.length < 3) return null;
+
+    final now = DateTime.now();
+    final threeMonthsAgo = DateTime(now.year, now.month - 3);
+    final recentIncomes = incomes
+        .where((income) => income.date.isAfter(threeMonthsAgo))
+        .toList();
+
+    if (recentIncomes.length < 3) return null;
+
+    // Group by month
+    final monthlyTotals = <String, double>{};
+    for (var income in recentIncomes) {
+      final monthKey = '${income.date.year}-${income.date.month}';
+      monthlyTotals[monthKey] = (monthlyTotals[monthKey] ?? 0) + income.amount;
+    }
+
+    if (monthlyTotals.length < 2) return null;
+
+    final values = monthlyTotals.values.toList();
+    final average = values.reduce((a, b) => a + b) / values.length;
+    
+    // Calculate coefficient of variation
+    final variance = values.map((value) => pow(value - average, 2)).reduce((a, b) => a + b) / values.length;
+    final stdDev = sqrt(variance);
+    final coefficientOfVariation = average > 0 ? stdDev / average : 0;
+
+    // High variation suggests irregular income
+    if (coefficientOfVariation > 0.5) {
+      return Insight(
+        id: const Uuid().v4(),
+        type: InsightType.anomaly,
+        severity: InsightSeverity.warning,
+        title: 'Income Irregularity Detected',
+        message: 'Your income varies significantly month to month. Consider building an emergency fund.',
+        createdDate: now,
+        isRead: false,
+        metadata: {
+          'variation_coefficient': coefficientOfVariation,
+          'average_monthly_income': average,
+        },
+      );
+    }
+
+    return null;
+  }
+
+  /// 5. Savings Rate Analysis
+  /// Provides insights about savings performance
+  static Insight? analyzeSavingsRate(
+    List<IncomeEntity> incomes,
+    List<ExpenseEntity> expenses,
+  ) {
+    if (incomes.isEmpty) return null;
+
+    final now = DateTime.now();
+    final currentMonthIncomes = incomes
+        .where((income) => 
+            income.date.year == now.year && 
+            income.date.month == now.month)
+        .toList();
+    
+    final currentMonthExpenses = expenses
+        .where((expense) => 
+            expense.date.year == now.year && 
+            expense.date.month == now.month)
+        .toList();
+
+    if (currentMonthIncomes.isEmpty) return null;
+
+    final totalIncome = currentMonthIncomes.fold<double>(0.0, (sum, income) => sum + income.amount);
+    final totalExpenses = currentMonthExpenses.fold<double>(0.0, (sum, expense) => sum + expense.amount);
+    final savings = totalIncome - totalExpenses;
+    final savingsRate = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
+
+    if (savings < 0) {
+      return Insight(
+        id: const Uuid().v4(),
+        type: InsightType.anomaly,
+        severity: InsightSeverity.critical,
+        title: 'Expenses Exceed Income',
+        message: 'This month, your expenses (${totalExpenses.toStringAsFixed(2)}) exceed your income (${totalIncome.toStringAsFixed(2)}). Review your spending urgently.',
+        createdDate: now,
+        isRead: false,
+        metadata: {
+          'income': totalIncome,
+          'expenses': totalExpenses,
+          'deficit': savings.abs(),
+        },
+      );
+    }
+
+    if (savingsRate >= 50) {
+      return Insight(
+        id: const Uuid().v4(),
+        type: InsightType.budgetPrediction,
+        severity: InsightSeverity.info,
+        title: 'Excellent Savings Rate!',
+        message: 'You saved ${savingsRate.toStringAsFixed(1)}% of your income this month. Keep up the great financial discipline!',
+        createdDate: now,
+        isRead: false,
+        metadata: {
+          'savings_rate': savingsRate,
+          'amount_saved': savings,
+        },
+      );
+    }
+
+    if (savingsRate >= 20) {
+      return Insight(
+        id: const Uuid().v4(),
+        type: InsightType.categoryDominance,
+        severity: InsightSeverity.info,
+        title: 'Good Savings Progress',
+        message: 'You saved ${savingsRate.toStringAsFixed(1)}% of your income. Consider ways to increase this rate further.',
+        createdDate: now,
+        isRead: false,
+        metadata: {
+          'savings_rate': savingsRate,
+          'amount_saved': savings,
+        },
+      );
+    }
+
+    return null;
+  }
+
+  /// 6. Balance Depletion Warning
+  /// Warns when balance is running low
+  static Insight? predictBalanceDepletion(
+    List<IncomeEntity> incomes,
+    List<ExpenseEntity> expenses,
+    double currentBalance,
+  ) {
+    if (currentBalance <= 0 || incomes.isEmpty) return null;
+
+    final now = DateTime.now();
+    final thirtyDaysAgo = now.subtract(const Duration(days: 30));
+    final recentExpenses = expenses.where((e) => e.date.isAfter(thirtyDaysAgo)).toList();
+    
+    if (recentExpenses.isEmpty) return null;
+
+    final dailySpendingRate = recentExpenses.fold<double>(0.0, (sum, e) => sum + e.amount) / 30;
+    
+    if (dailySpendingRate <= 0) return null;
+
+    final daysUntilDepletion = (currentBalance / dailySpendingRate).floor();
+
+    if (daysUntilDepletion <= 7) {
+      return Insight(
+        id: const Uuid().v4(),
+        type: InsightType.budgetPrediction,
+        severity: InsightSeverity.warning,
+        title: 'Low Balance Alert',
+        message: 'At your current spending rate, your balance will reach zero in approximately $daysUntilDepletion days. Consider reducing expenses or adding income.',
+        createdDate: now,
+        isRead: false,
+        metadata: {
+          'current_balance': currentBalance,
+          'daily_spending_rate': dailySpendingRate,
+          'days_until_depletion': daysUntilDepletion,
+        },
+      );
+    }
+
+    return null;
   }
 }

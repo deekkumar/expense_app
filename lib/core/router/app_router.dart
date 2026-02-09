@@ -9,6 +9,7 @@ import 'package:smart_expense_tracker/features/expenses/presentation/screens/add
 import 'package:smart_expense_tracker/features/settings/presentation/screens/settings_screen.dart';
 import 'package:smart_expense_tracker/features/grocery/presentation/screens/grocery_session_screen.dart';
 import 'package:smart_expense_tracker/features/ocr/presentation/screens/ocr_scan_screen.dart';
+import 'package:smart_expense_tracker/features/income/presentation/screens/add_edit_income_screen.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 final _shellNavigatorExpenseKey = GlobalKey<NavigatorState>(
@@ -129,6 +130,25 @@ final goRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const OCRScanScreen(),
           ),
         ],
+      ),
+      // Income Routes
+      GoRoute(
+        path: '/income/add',
+        name: 'add-income',
+        builder: (context, state) => const AddEditIncomeScreen(),
+      ),
+      GoRoute(
+        path: '/income/edit/:id',
+        name: 'edit-income',
+        builder: (context, state) {
+          final id = state.pathParameters['id']!;
+          // For simplicity, we'll pass the income data through extras
+          // In a real app, you'd fetch the income by ID
+          final extras = state.extra as Map<String, dynamic>? ?? {};
+          return AddEditIncomeScreen(
+            income: extras['income'] as dynamic, // Will need proper casting
+          );
+        },
       ),
     ],
   );
